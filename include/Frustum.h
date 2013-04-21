@@ -1,34 +1,37 @@
+#pragma once
+#include <GL/glew.h>
 #include "Math3D.h"
+#include "Frame.h"
 
 namespace gliby {
 
 class Frustum {
     public:
-        GLFrustum(void);
-        GLFrustum(GLfloat fov, GLfloat aspect, GLfloat near, GLfloat far);
-        GLFrustum(GLfloat xmin, GLfloat xmax, GLfloat ymin, GLfloat ymax, GLfloat zmin, GLfloat zmax);
+        Frustum(void);
+        Frustum(GLfloat fov, GLfloat aspect, GLfloat near, GLfloat far);
+        Frustum(GLfloat xmin, GLfloat xmax, GLfloat ymin, GLfloat ymax, GLfloat zmin, GLfloat zmax);
         
-        const Matrix44f& getProjectionMatrix(void);
+        const Math3D::Matrix44f& getProjectionMatrix(void);
 
         void setOrthographic(GLfloat xmin, GLfloat xmax, GLfloat ymin, GLfloat ymax, GLfloat zmin, GLfloat zmax);
 
         void setPerspective(GLfloat fov, GLfloat aspect, GLfloat near, GLfloat far);
 
-        void transform(GLframe& camera);
+        void transform(gliby::Frame& camera);
 
         bool testSphere(float x, float y, float z, float radius);
-        bool testSphere(Vector3f point, float radius);
+        bool testSphere(Math3D::Vector3f point, float radius);
     protected:
-        Matrix44f projectionMatrix;
+        Math3D::Matrix44f projectionMatrix;
         // untransformed corners of the frustum
-        Vector4f nearUL, nearLL, nearUR, nearLR;
-        Vector4f farUL, farLL, farUR, farLR;
+        Math3D::Vector4f nearUL, nearLL, nearUR, nearLR;
+        Math3D::Vector4f farUL, farLL, farUR, farLR;
         // transformed corners of the frustum
-        Vector4f nearULT, nearLLT, nearURT, nearLRT;
-        Vector4f farULT, farLLT, farURT, farLRT;
+        Math3D::Vector4f nearULT, nearLLT, nearURT, nearLRT;
+        Math3D::Vector4f farULT, farLLT, farURT, farLRT;
         // base and transformed plane equations
-        Vector4f nearPlane, farPlane, leftPlane, rightPlane;
-        Vector4f topPlane, bottomPlane;
+        Math3D::Vector4f nearPlane, farPlane, leftPlane, rightPlane;
+        Math3D::Vector4f topPlane, bottomPlane;
 };
 
 }
