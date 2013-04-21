@@ -3,6 +3,8 @@
 #include <unordered_map>
 #include <GL/glew.h>
 
+namespace gliby {
+
 struct ShaderAttribute {
     GLuint index;
     const char* name;
@@ -21,3 +23,5 @@ class ShaderManager {
         std::vector<const char*>* searchPath;
         std::unordered_map<const char*,GLuint> shaderCache;
 };
+
+}

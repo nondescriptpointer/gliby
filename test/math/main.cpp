@@ -9,7 +9,7 @@
 #include <iomanip>
 #include <boost/format.hpp>
 using boost::format;
-using namespace Math3D;
+using namespace gliby::Math3D;
 
 int nSuccess = 0;
 int nTotal = 0;

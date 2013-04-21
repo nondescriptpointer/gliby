@@ -1,6 +1,9 @@
 #include <Batch.h>
 #include <iostream>
 
+using namespace Math3D;
+using namespace gliby;
+
 Batch::Batch(void): 
     vertexArray(0), normalArray(0), colorArray(0), texCoordArray(NULL), vertexArrayObject(0), 
     nNumVerts(0), nNumTextureUnits(0), done(false) {

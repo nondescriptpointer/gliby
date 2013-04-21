@@ -5,6 +5,8 @@
 #include <vector>
 #include <boost/filesystem.hpp>
 
+using namespace gliby;
+
 ShaderManager::ShaderManager(std::vector<const char*>* search_path){
     searchPath = search_path;
 }
