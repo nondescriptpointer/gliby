@@ -3,15 +3,15 @@
 
 using namespace gliby;
 
-Actor::Actor(Batch* geometry, GLuint text):batch(geometry),texture(text){
+Actor::Actor(Geometry* geometry, GLuint text):geom(geometry),texture(text){
     // do nothing
 }
 
 Frame& Actor::getFrame(){
     return frame;
 }
-Batch& Actor::getGeometry(){
-    return *batch;
+Geometry& Actor::getGeometry(){
+    return *geom;
 }
 GLuint Actor::getTexture(){
     return texture;

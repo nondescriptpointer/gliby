@@ -1,19 +1,19 @@
 #pragma once
 
 #include <GL/glew.h>
-#include "Batch.h"
+#include "Geometry.h"
 #include "Frame.h"
 
 namespace gliby {
 
 class Actor {
     public:
-        Actor(Batch* geometry, GLuint text = 0);
+        Actor(Geometry* geometry, GLuint text = 0);
         Frame& getFrame();
-        Batch& getGeometry();
+        Geometry& getGeometry();
         GLuint getTexture();
     protected:
-        Batch* batch;
+        Geometry* geom;
         GLuint texture;
         Frame frame;
 };

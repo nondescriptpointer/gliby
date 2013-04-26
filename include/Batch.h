@@ -2,10 +2,11 @@
 
 #include <GL/glew.h>
 #include "Math3D.h"
+#include "Geometry.h"
 
 namespace gliby {
 
-class Batch {
+class Batch : public Geometry {
     public:
         Batch(void);
         ~Batch(void);
@@ -25,7 +26,7 @@ class Batch {
         void copyTexCoordData2f(GLfloat *texCoords_, GLuint texture);
         
         // draw
-        void draw(void);
+        virtual void draw(void);
 
         void reset(void);
 
