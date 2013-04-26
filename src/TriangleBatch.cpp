@@ -1,5 +1,6 @@
 #include "TriangleBatch.h"
 #include <string.h>
+#include <iostream>
 
 using namespace gliby;
 using namespace Math3D;
