@@ -273,3 +273,108 @@ Batch& GeometryFactory::cube(GLfloat size){
     batch->end();
     return *batch;
 }
+
+
+TriangleBatch& GeometryFactory::cylinder(GLfloat baseRadius, GLfloat topRadius, GLfloat length, GLint slices, GLint stacks){
+    TriangleBatch* batch = new TriangleBatch();
+    
+    float radiusStep = (topRadius - baseRadius) / float(stacks);
+    GLfloat stepSizeSlice = (3.141592653589 * 2.0f) / float (slices);
+
+    Vector3f vertex[4];
+    Vector3f normal[4];
+    Vector2f texture[4];
+
+    batch->begin(slices * stacks * 6);
+
+    GLfloat ds = 1.0f / float(slices);
+    GLfloat dt = 1.0f / float(stacks);
+    GLfloat s, t;
+
+    for(int i = 0; i < stacks; i++){
+        if(i ==0) t = 0.0f;
+        else t = float(i) * dt;
+        float tNext;
+        if(i == (stacks - 1)) tNext = 1.0f;
+        else tNext = float(i+1) * dt;
+        float currentRadius = baseRadius + (radiusStep * float(i));
+        float nextRadius = baseRadius + (radiusStep * float(i+1));
+        float theyta;
+        float theytaNext;
+        float currentZ = float(i) * (length / float(stacks));
+        float nextZ = float(i+1) * (length / float(stacks));
+        float zNormal = 0.0f;
+        if(!closeEnough(baseRadius - topRadius, 0.0f, 0.00001f))
+            zNormal = (baseRadius - topRadius);
+        for(int j = 0; j < slices; j++){
+            if(j == 0) s = 0.0f;
+            else s = float(j) * ds;
+            float sNext;
+            if(j == (slices - 1)) sNext = 1.0f;
+            else sNext = float(j+1) * ds;
+            theyta = stepSizeSlice * float(j);
+            if(j == (slices - 1)) theytaNext = 0.0f;
+            else theytaNext = stepSizeSlice * (float(j+1));
+            // inner first
+            vertex[1][0] = cos(theyta) * currentRadius;
+            vertex[1][1] = sin(theyta) * currentRadius;
+            vertex[1][2] = currentZ;
+            normal[1][0] = vertex[1][0];
+            normal[1][1] = vertex[1][1];
+            normal[1][2] = zNormal;
+            normalizeVector(normal[1]);
+            texture[1][0] = s;
+            texture[1][1] = t;
+            // outer first
+            vertex[0][0] = cos(theyta) * nextRadius;
+            vertex[0][1] = sin(theyta) * nextRadius;
+            vertex[0][2] = nextZ;
+            if(!closeEnough(nextRadius, 0.0f, 0.00001f)){
+                normal[0][0] = vertex[0][0];
+                normal[0][1] = vertex[0][1];
+                normal[0][2] = zNormal;
+                normalizeVector(normal[0]);
+            }else{
+                memcpy(normal[0], normal[1], sizeof(Vector3f));
+            }
+            texture[0][0] = s;
+            texture[0][1] = tNext;
+            // inner second
+            vertex[3][0] = cos(theytaNext) * currentRadius;
+            vertex[3][1] = sin(theytaNext) * currentRadius;
+            vertex[3][2] = currentZ;
+            normal[3][0] = vertex[3][0];
+            normal[3][1] = vertex[3][1];
+            normal[3][2] = zNormal;
+            normalizeVector(normal[3]);
+            texture[3][0] = sNext;
+            texture[3][1] = t;
+            // outer second
+            vertex[2][0] = cos(theytaNext) * nextRadius;
+            vertex[2][1] = sin(theytaNext) * nextRadius;
+            vertex[2][2] = nextZ;
+            if(!closeEnough(nextRadius, 0.0f, 0.00001f)){
+                normal[2][0] = vertex[2][0];
+                normal[2][1] = vertex[2][1];
+                normal[2][2] = zNormal;
+                normalizeVector(normal[2]);
+            }else{
+                memcpy(normal[2], normal[3], sizeof(Vector3f));
+            }
+            texture[2][0] = sNext;
+            texture[2][1] = tNext;
+            // add new triangle
+            batch->addTriangle(vertex, normal, texture);
+            // rearrange for next triangle
+            memcpy(vertex[0], vertex[1], sizeof(Vector3f));
+            memcpy(normal[0], normal[1], sizeof(Vector3f));
+            memcpy(texture[0], texture[1], sizeof(Vector2f));
+            memcpy(vertex[1], vertex[3], sizeof(Vector3f));
+            memcpy(normal[1], normal[3], sizeof(Vector3f));
+            memcpy(texture[1], texture[3], sizeof(Vector2f));
+            batch->addTriangle(vertex, normal, texture);
+        }
+    }
+    batch->end();
+    return *batch;
+}
