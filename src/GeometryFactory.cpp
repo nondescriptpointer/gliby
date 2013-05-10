@@ -1,11 +1,11 @@
 #include "GeometryFactory.h"
+#include "Batch.h"
 #include "TriangleBatch.h"
 #include "Math3D.h"
 #include <string.h>
 
 using namespace gliby;
 using namespace Math3D;
-
 
 TriangleBatch& GeometryFactory::sphere(GLfloat radius, GLint slices, GLint stacks){
     TriangleBatch* batch = new TriangleBatch();
@@ -107,6 +107,169 @@ TriangleBatch& GeometryFactory::sphere(GLfloat radius, GLint slices, GLint stack
         }
         t -= dt;
     }
+    batch->end();
+    return *batch;
+}
+
+Batch& GeometryFactory::plane(GLfloat width, GLfloat height, GLfloat x, GLfloat y, GLfloat z){
+    Batch* batch = new Batch();
+    batch->begin(GL_TRIANGLE_FAN, 4, 1);
+    GLfloat verts[] = {
+        -width/2+x, height/2+y, z,
+        -width/2+x, -height/2+y, z,
+        width/2+x, -height/2+y, z,
+        width/2+x, height/2+y, z
+    };
+    GLfloat texcoords[] = {
+        0.0f, 0.0f,
+        0.0f, 1.0f,
+        1.0f, 1.0f,
+        1.0f, 0.0f
+    };
+    batch->copyVertexData3f(verts);
+    batch->copyTexCoordData2f(texcoords,0);
+    batch->end();
+    return *batch;
+}
+
+Batch& GeometryFactory::cube(GLfloat size){
+    Batch* batch = new Batch();
+    batch->begin(GL_TRIANGLES, 36, 1);
+    GLfloat verts[] = {
+        // top
+        size, size, size,
+        size, size, -size,
+        -size, size, -size,
+        size, size, size,
+        -size, size, -size,
+        -size, size, size,
+        // bottom
+        -size, -size, -size,
+        size, -size, -size,
+        size, -size, size,
+        -size, -size, size,
+        -size, -size, -size,
+        size, -size, size,
+        // left
+        -size, size, size,
+        -size, size, -size,
+        -size, -size, -size,
+        -size, size, size,
+        -size, -size, -size,
+        -size, -size, size,
+        // right
+        size, -size, -size,
+        size, size, -size,
+        size, size, size,
+        size, size, size,
+        size, -size, size,
+        size, -size, -size,
+        // front
+        size, -size, size,
+        size, size, size,
+        -size, size, size,
+        -size, size, size,
+        -size, -size, size,
+        size, -size, size,
+        // back
+        size, -size, -size,
+        -size, -size, -size,
+        -size, size, -size,
+        -size, size, -size,
+        size, size, -size,
+        size, -size, -size
+    };
+    GLfloat norms[] = {
+        // top
+        0.0f, 1.0f, 0.0f,
+        0.0f, 1.0f, 0.0f,
+        0.0f, 1.0f, 0.0f,
+        0.0f, 1.0f, 0.0f,
+        0.0f, 1.0f, 0.0f,
+        0.0f, 1.0f, 0.0f,
+        // bottom
+        0.0f, -1.0f, 0.0f,
+        0.0f, -1.0f, 0.0f,
+        0.0f, -1.0f, 0.0f,
+        0.0f, -1.0f, 0.0f,
+        0.0f, -1.0f, 0.0f,
+        0.0f, -1.0f, 0.0f,
+        // left
+        -1.0f, 0.0f, 0.0f,
+        -1.0f, 0.0f, 0.0f,
+        -1.0f, 0.0f, 0.0f,
+        -1.0f, 0.0f, 0.0f,
+        -1.0f, 0.0f, 0.0f,
+        -1.0f, 0.0f, 0.0f,
+        // right
+        1.0f, 0.0f, 0.0f,
+        1.0f, 0.0f, 0.0f,
+        1.0f, 0.0f, 0.0f,
+        1.0f, 0.0f, 0.0f,
+        1.0f, 0.0f, 0.0f,
+        1.0f, 0.0f, 0.0f,
+        // front
+        0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f,
+        // back
+        0.0f, 0.0f, -1.0f,
+        0.0f, 0.0f, -1.0f,
+        0.0f, 0.0f, -1.0f,
+        0.0f, 0.0f, -1.0f,
+        0.0f, 0.0f, -1.0f,
+        0.0f, 0.0f, -1.0f
+    };
+    GLfloat texcoords[] = {
+        // top
+        1.0f, 1.0f,
+        1.0f, 0.0f,
+        0.0f, 0.0f,
+        1.0f, 1.0f,
+        0.0f, 0.0f,
+        0.0f, 1.0f,
+        // bottom
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+        1.0f, 1.0f,
+        0.0f, 1.0f,
+        0.0f, 0.0f,
+        1.0f, 1.0f,
+        // left
+        1.0f, 1.0f,
+        1.0f, 0.0f,
+        0.0f, 0.0f,
+        1.0f, 1.0f,
+        0.0f, 0.0f,
+        0.0f, 1.0f,
+        // right
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+        1.0f, 1.0f,
+        1.0f, 1.0f,
+        0.0f, 1.0f,
+        0.0f, 0.0f,
+        // front
+        1.0f, 0.0f,
+        1.0f, 1.0f,
+        0.0f, 1.0f,
+        0.0f, 1.0f,
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+        // back
+        1.0f, 0.0f,
+        0.0f, 0.0f,
+        0.0f, 1.0f,
+        0.0f, 1.0f,
+        1.0f, 1.0f,
+        1.0f, 0.0f
+    };
+    batch->copyVertexData3f(verts);
+    batch->copyTexCoordData2f(texcoords,0);
+    batch->copyNormalDataf(norms);
     batch->end();
     return *batch;
 }
