@@ -132,6 +132,27 @@ Batch& GeometryFactory::plane(GLfloat width, GLfloat height, GLfloat x, GLfloat 
     return *batch;
 }
 
+Batch& GeometryFactory::overlay(GLfloat width, GLfloat height, GLfloat x, GLfloat y){
+    Batch* batch = new Batch();
+    batch->begin(GL_TRIANGLE_FAN, 4, 1);
+    GLfloat verts[] = {
+        x, y, 0.0f,
+        x, y - height, 0.0f,
+        x + width, y - height, 0.0f,
+        x + width, y, 0.0f
+    };
+    GLfloat texcoords[] = {
+        0.0f, 0.0f,
+        0.0f, 1.0f,
+        1.0f, 1.0f,
+        1.0f, 0.0f
+    };
+    batch->copyVertexData3f(verts);
+    batch->copyTexCoordData2f(texcoords,0);
+    batch->end();
+    return *batch;
+}
+
 Batch& GeometryFactory::cube(GLfloat size){
     Batch* batch = new Batch();
     batch->begin(GL_TRIANGLES, 36, 1);

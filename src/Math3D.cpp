@@ -288,9 +288,9 @@ void Math3D::makePerspectiveMatrix(Matrix44f projection, const float fov, const 
 }
 void Math3D::makeOrthographicMatrix(Matrix44f projection, const float xMin, const float xMax, const float yMin, const float yMax, const float zMin, const float zMax){
     loadIdentity44(projection);
-    projection[0] = 2 / (xMax - xMin);
-    projection[5] = 2 / (yMax - yMin);
-    projection[10] = -2 / (zMax - zMin);
+    projection[0] = 2.0f / (xMax - xMin);
+    projection[5] = 2.0f / (yMax - yMin);
+    projection[10] = -2.0f / (zMax - zMin);
     projection[12] = -((xMax + xMin)/(xMax - xMin));
     projection[13] = -((yMax + yMin)/(yMax - yMin));
     projection[14] = -((zMax + zMin)/(zMax - zMin));
