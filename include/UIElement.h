@@ -15,7 +15,7 @@ class UIElement {
         void mouseUpdate(int x, int y);
         void mouseEvent(int id, int state);
         void charEvent(int character, int state);
-        void keyEvent(int key, int state); 
+        void keyEvent(int key, int state, bool shift_down = false, bool ctrl_down = false, bool alt_down = false); 
         void draw();
         void setX(int x);
         void setY(int y);

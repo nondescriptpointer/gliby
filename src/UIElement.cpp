@@ -5,6 +5,7 @@
 #include <string.h>
 #include <iostream>
 #include <unistd.h>
+#include "berkelium/Berkelium.hpp"
 
 using namespace gliby;
 using namespace Math3D;
@@ -80,8 +81,22 @@ void UIElement::charEvent(int character, int state){
     c[1] = 0;
     if(over) window->window()->textEvent(c,1);
 }
-void UIElement::keyEvent(int key, int state){
-    
+void UIElement::keyEvent(int key, int state, bool shift_down, bool ctrl_down, bool alt_down){
+    int code = 0;
+    if(key == 293) code = 9; // tab
+    else if(key == 297) code = 46; // delete
+    else if(key == 295) code = 8; // backspace
+    else if(key == 285) code = 37; // left
+    else if(key == 286) code = 39; // right
+    else if(key == 283) code = 38; // up
+    else if(key == 284) code = 40; // down
+    else if(key == 300) code = 36; // home
+    else if(key == 301) code = 35; // end
+    int mods = 0;
+    if(shift_down) mods |= Berkelium::SHIFT_MOD;
+    if(ctrl_down) mods |= Berkelium::CONTROL_MOD;
+    if(alt_down) mods |= Berkelium::ALT_MOD;
+    window->window()->keyEvent(state,mods,code,0); 
 }
 void UIElement::setX(int x){
     xpos = x;
