@@ -4,11 +4,35 @@
 #include "GeometryFactory.h"
 #include <string.h>
 #include <iostream>
+#include <unistd.h>
 
 using namespace gliby;
 using namespace Math3D;
 
 UIElement::UIElement(const char* location, int width, int height, int x, int y, Matrix44f &screenSpace, int window_width, int window_height,  GLuint shader, bool transparent, bool debug):window(NULL),batch(NULL),over(false),w(width),h(height),xpos(x),ypos(y),window_w(window_width),window_h(window_height),shaderObj(shader) {
+    // create a relative file:// url if url doesn't start with http://
+    // TODO: this is horrible and will probably only work on linux
+    const char* path = location;
+    const char* http = "http://";
+    char prefix[7];
+    strncpy(prefix,location,7);
+    if(strcmp(http,prefix) !=  0){
+        char newstring[1024];
+        // add file://
+        strcpy(newstring,"file://");
+        // add local path
+        char buf[1024];
+        readlink("/proc/self/exe",buf,1024);
+        char *loc;
+        loc = strrchr(buf,'/');
+        char fullpath[1024];
+        strncpy(fullpath,buf,loc-buf+1);
+        strcat(newstring,fullpath);
+        // add actual filename
+        strcat(newstring,location);
+        std::cout << newstring << std::endl;
+        path = newstring;
+    }
     // set up matrices
     projectionMatrix = &screenSpace;
     resize(window_w, window_h);
@@ -16,7 +40,7 @@ UIElement::UIElement(const char* location, int width, int height, int x, int y, 
     window = new TextureWindow(width,height,transparent,debug);
     window->clear();
     window->window()->focus();
-    window->window()->navigateTo(location,strlen(location));
+    window->window()->navigateTo(path,strlen(path));
     // create batch
     batch = &GeometryFactory::overlay(float(width),float(height),0.0f,0.0f);
 }
