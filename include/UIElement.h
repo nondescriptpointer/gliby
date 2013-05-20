@@ -9,8 +9,9 @@ namespace gliby {
 
 class UIElement {
     public:
-        UIElement(const char* location, int width, int height, int x, int y, Math3D::Matrix44f &screenSpace, int window_width, int window_height, GLuint shader, bool transparent = true, bool debug = false);
+        UIElement(int width, int height, int x, int y, Math3D::Matrix44f &screenSpace, int window_width, int window_height, GLuint shader, bool transparent = true, bool debug = false);
         ~UIElement();
+        void load(const char* location);
         void resize(int w, int h);
         void mouseUpdate(int x, int y);
         void mouseEvent(int id, int state);
@@ -19,6 +20,7 @@ class UIElement {
         void draw();
         void setX(int x);
         void setY(int y);
+        TextureWindow& getWindow(void);
     protected:
         TextureWindow* window;
         Batch* batch;

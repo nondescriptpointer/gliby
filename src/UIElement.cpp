@@ -10,7 +10,23 @@
 using namespace gliby;
 using namespace Math3D;
 
-UIElement::UIElement(const char* location, int width, int height, int x, int y, Matrix44f &screenSpace, int window_width, int window_height,  GLuint shader, bool transparent, bool debug):window(NULL),batch(NULL),over(false),w(width),h(height),xpos(x),ypos(y),window_w(window_width),window_h(window_height),shaderObj(shader) {
+UIElement::UIElement(int width, int height, int x, int y, Matrix44f &screenSpace, int window_width, int window_height,  GLuint shader, bool transparent, bool debug):window(NULL),batch(NULL),over(false),w(width),h(height),xpos(x),ypos(y),window_w(window_width),window_h(window_height),shaderObj(shader) {
+    // set up matrices
+    projectionMatrix = &screenSpace;
+    resize(window_w, window_h);
+    // create texture window
+    window = new TextureWindow(width,height,transparent,debug);
+    window->clear();
+    window->window()->focus();
+    // create batch
+    batch = &GeometryFactory::overlay(float(width),float(height),0.0f,0.0f);
+}
+UIElement::~UIElement(){
+    delete window;
+    delete batch;
+}
+
+void UIElement::load(const char* location){
     // create a relative file:// url if url doesn't start with http://
     // TODO: this is horrible and will probably only work on linux
     const char* path = location;
@@ -34,20 +50,7 @@ UIElement::UIElement(const char* location, int width, int height, int x, int y, 
         std::cout << newstring << std::endl;
         path = newstring;
     }
-    // set up matrices
-    projectionMatrix = &screenSpace;
-    resize(window_w, window_h);
-    // create texture window
-    window = new TextureWindow(width,height,transparent,debug);
-    window->clear();
-    window->window()->focus();
     window->window()->navigateTo(path,strlen(path));
-    // create batch
-    batch = &GeometryFactory::overlay(float(width),float(height),0.0f,0.0f);
-}
-UIElement::~UIElement(){
-    delete window;
-    delete batch;
 }
 
 void UIElement::draw(){
@@ -103,4 +106,7 @@ void UIElement::setX(int x){
 }
 void UIElement::setY(int y){
     ypos = y;
+}
+TextureWindow& UIElement::getWindow(void){
+    return *window;
 }

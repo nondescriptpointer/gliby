@@ -1,6 +1,8 @@
 #include "TextureWindow.h"
+#include <stdlib.h>
 #include <iostream>
 #include <string.h>
+#include <jsoncpp/json/json.h>
 
 using namespace gliby;
 
@@ -237,29 +239,41 @@ void TextureWindow::onJavascriptCallback(Berkelium::Window* win, void* replyMsg,
         std::cout << "BK: Javascript callback at URL " << url << ", " << (replyMsg ? "synchronous" : "async") << std::endl;
         std::wcout << L"  Function name: " << funcName << std::endl;
         for(size_t i = 0; i < numArgs; i++){
-            Berkelium::WideString jsonString = Berkelium::Script::toJSON(args[i]);
             std::wcout << "  Argument " << i << ": ";
             if(args[i].type() == Berkelium::Script::Variant::JSSTRING){
                 std::wcout << "(string) " << args[i].toString() << std::endl;
             }else{
+                Berkelium::WideString jsonString = Berkelium::Script::toJSON(args[i]);
                 std::wcout << jsonString << std::endl;
+                Berkelium::Script::toJSON_free(jsonString);
             }
-            Berkelium::Script::toJSON_free(jsonString);
         }
         if(replyMsg){
             win->synchronousScriptReturn(replyMsg, numArgs ? args[0] : Berkelium::Script::Variant());
         }
     }
     for(std::vector<CallbackHandler*>::size_type e = 0; e < handlers.size(); e++){
-        std::wcout << std::wstring(funcName.data(),funcName.length()) << std::endl;
-        std::wcout << handlers[e]->funcName << std::endl;
         if(std::wstring(funcName.data(),funcName.length()) == std::wstring(handlers[e]->funcName.data(),handlers[e]->funcName.length())){
-            handlers[e]->func();
+            // parse the first argument as json
+            Berkelium::WideString val = args[0].toString();
+            char converted[val.length()];
+            wcstombs(converted,val.data(),val.length()); // need to convert the wchar to multibyte character string
+            std::string jsondata(converted);
+            Json::Value root;
+            Json::Reader reader;
+            bool parseSuccess = reader.parse(jsondata,root,false);
+            if(parseSuccess){
+                handlers[e]->func(&root);
+                //std::cout << root.get("matrix","").asArray() << std::endl;
+            }else{
+                handlers[e]->func(NULL);
+            }
         }
     }
 }
 
 void TextureWindow::registerCallback(CallbackHandler* handler){
+    bk_window->addBindOnStartLoading(handler->funcName,Berkelium::Script::Variant::bindFunction(handler->funcName,false));
     handlers.push_back(handler);
 }
 

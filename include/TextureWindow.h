@@ -6,12 +6,13 @@
 #include "berkelium/WindowDelegate.hpp"
 #include "berkelium/Context.hpp"
 #include "berkelium/ScriptUtil.hpp"
+#include <jsoncpp/json/json.h>
 
 namespace gliby {
 
 struct CallbackHandler {
     Berkelium::WideString funcName; 
-    void (*func)(void);
+    void (*func)(Json::Value* root);
 };
 
 class TextureWindow : public Berkelium::WindowDelegate {
