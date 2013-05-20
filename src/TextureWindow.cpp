@@ -33,6 +33,7 @@ TextureWindow::~TextureWindow(void){
     delete scroll_buffer;
     delete bk_window;
     glDeleteTextures(1, &texture_id); // will cause problems if texture is still being used
+    // TODO: clean up callback handlers
 }
 
 Berkelium::Window* TextureWindow::window(void) const {
@@ -272,7 +273,8 @@ void TextureWindow::onJavascriptCallback(Berkelium::Window* win, void* replyMsg,
     }
 }
 
-void TextureWindow::registerCallback(CallbackHandler* handler){
+void TextureWindow::registerCallback(const wchar_t* name, void (*func)(Json::Value* func)){
+    CallbackHandler* handler = new CallbackHandler({Berkelium::WideString::point_to(name),func}); 
     bk_window->addBindOnStartLoading(handler->funcName,Berkelium::Script::Variant::bindFunction(handler->funcName,false));
     handlers.push_back(handler);
 }

@@ -48,7 +48,7 @@ class TextureWindow : public Berkelium::WindowDelegate {
         virtual void onWidgetMove(Berkelium::Window* win, Berkelium::Widget* widget, int x, int y);
         virtual void onShowContextMenu(Berkelium::Window* win, const Berkelium::ContextMenuEventArgs& args);
         virtual void onJavascriptCallback(Berkelium::Window* win, void* replyMsg, Berkelium::URLString url, Berkelium::WideString funcName, Berkelium::Script::Variant *args, size_t numArgs);
-        void registerCallback(CallbackHandler* handler);
+        void registerCallback(const wchar_t* name, void (*func)(Json::Value* func));
         virtual void onRunFileChooser(Berkelium::Window* win, int mode, Berkelium::WideString title, Berkelium::FileString defaultFile);
         virtual void onExternalHost(Berkelium::Window* win, Berkelium::WideString message, Berkelium::URLString origin, Berkelium::URLString target);
 
