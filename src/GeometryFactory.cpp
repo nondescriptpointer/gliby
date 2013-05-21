@@ -132,6 +132,36 @@ Batch& GeometryFactory::plane(GLfloat width, GLfloat height, GLfloat x, GLfloat 
     return *batch;
 }
 
+Batch& GeometryFactory::grid(GLfloat size, GLint subdivs){
+    Batch* batch = new Batch();
+    batch->begin(GL_LINES, (subdivs+1) * 4, 0);
+    GLfloat verts[(subdivs+1)*3*4];
+    GLfloat width = size / subdivs;
+    GLfloat half = size / 2;
+    for(int i = 0; i <= subdivs; i++){
+        int offset = i * 12;
+        // line 1, vert 1
+        verts[offset] = -half+i*width;
+        verts[offset+1] = -half;
+        verts[offset+2] = 0.0f;
+        // line 1, vert 2
+        verts[offset+3] = -half+i*width;
+        verts[offset+4] = half;
+        verts[offset+5] = 0.0f;
+        // line 2, vert 1
+        verts[offset+6] = -half;
+        verts[offset+7] = -half+i*width;
+        verts[offset+8] = 0.0f;
+        // line 2, vert 2
+        verts[offset+9] = half;
+        verts[offset+10] = -half+i*width;
+        verts[offset+11] = 0.0f;
+    }
+    batch->copyVertexData3f(verts);
+    batch->end();
+    return *batch;
+}
+
 Batch& GeometryFactory::overlay(GLfloat width, GLfloat height, GLfloat x, GLfloat y){
     Batch* batch = new Batch();
     batch->begin(GL_TRIANGLE_FAN, 4, 1);
