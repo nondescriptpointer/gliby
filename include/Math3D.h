@@ -42,6 +42,14 @@ unsigned int firstPowOf2(const unsigned int val);
 
 // can't overload fully because function signature of Vector2f 
 
+// output vector
+void outputVector2(Vector3f v);
+void outputVector2(Vector3d v);
+void outputVector3(Vector3f v);
+void outputVector3(Vector3d v);
+void outputVector4(Vector3f v);
+void outputVector4(Vector3d v);
+
 // add vectors (r = a + b)
 void addVectors2(Vector2f r, const Vector2f a, const Vector2f b);
 void addVectors2(Vector2d r, const Vector2d a, const Vector2d b);

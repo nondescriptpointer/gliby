@@ -15,6 +15,25 @@ unsigned int Math3D::firstPowOf2(unsigned int val){
  * VECTOR OPERATIONS
  * */
 
+void Math3D::outputVector2(Vector3f v){
+    std::cout << "{" << v[0] << ", " << v[1] << "}" << std::endl;
+}
+void Math3D::outputVector2(Vector3d v){
+    std::cout << "{" << v[0] << ", " << v[1] << "}" << std::endl;
+}
+void Math3D::outputVector3(Vector3f v){
+    std::cout << "{" << v[0] << ", " << v[1] << ", " << v[2] << "}" << std::endl;
+}
+void Math3D::outputVector3(Vector3d v){
+    std::cout << "{" << v[0] << ", " << v[1] << ", " << v[2] << "}" << std::endl;
+}
+void Math3D::outputVector4(Vector3f v){
+    std::cout << "{" << v[0] << ", " << v[1] << ", " << v[2] << ", " << v[3] << "}" << std::endl;
+}
+void Math3D::outputVector4(Vector3d v){
+    std::cout << "{" << v[0] << ", " << v[1] << ", " << v[2] << ", " << v[3] << "}" << std::endl;
+}
+
 void Math3D::addVectors2(Vector2f r, const Vector2f a, const Vector2f b){ r[0] = a[0] + b[0]; r[1] = a[1] + b[1]; }
 void Math3D::addVectors2(Vector2d r, const Vector2d a, const Vector2d b){ r[0] = a[0] + b[0]; r[1] = a[1] + b[1]; }
 void Math3D::addVectors3(Vector3f r, const Vector3f a, const Vector3f b){ r[0] = a[0] + b[0]; r[1] = a[1] + b[1]; r[2] = a[2] + b[2]; }

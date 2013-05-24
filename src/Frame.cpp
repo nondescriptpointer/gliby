@@ -1,6 +1,7 @@
 #include "Frame.h"
 #include <string.h>
 #include "Math3D.h"
+#include <iostream>
 
 using namespace Math3D;
 using namespace gliby;
@@ -19,7 +20,7 @@ float Frame::getOriginY(void){ return origin[1]; }
 float Frame::getOriginZ(void){ return origin[2]; }
 
 void Frame::setForward(Vector3f direction){ memcpy(forward, direction, sizeof(Vector3f)); }
-void Frame::setForward(float x, float y, float z){ origin[0] = x; origin[1] = y; origin[2] = z; }
+void Frame::setForward(float x, float y, float z){ forward[0] = x; forward[1] = y; forward[2] = z; }
 void Frame::getForward(Vector3f vector){ memcpy(vector, forward, sizeof(Vector3f)); }
 
 void Frame::setUp(Vector3f direction){ memcpy(up, direction, sizeof(Vector3f)); }
@@ -30,7 +31,7 @@ void Frame::getXAxis(Vector3f vector){ crossProduct(vector, up, forward); }
 void Frame::getYAxis(Vector3f vector){ getUp(vector); }
 void Frame::getZAxis(Vector3f vector){ getForward(vector); }
 
-void Frame::translateWorld(float x, float y, float z){ origin[0] += 0; origin[1] += y; origin[2] += z; }
+void Frame::translateWorld(float x, float y, float z){ origin[0] += x; origin[1] += y; origin[2] += z; }
 void Frame::translateLocal(float x, float y, float z){ moveForward(z); moveUp(y); moveRight(x); }
 
 void Frame::moveForward(float delta){
@@ -49,6 +50,44 @@ void Frame::moveRight(float delta){
     origin[0] += cross[0] * delta;
     origin[1] += cross[1] * delta;
     origin[2] += cross[2] * delta;
+}
+
+void Frame::lookAt(float x, float y, float z){
+    Vector3f target = {x,y,z}; 
+    lookAt(target);
+}
+void Frame::lookAt(Math3D::Vector3f target){
+    subtractVectors3(target,target,origin);
+
+    Vector3f projectedTarget;
+    memcpy(projectedTarget, target, sizeof(Vector3f));
+
+    // project on the XZ or YZ plane
+    if(fabs(target[0]) < 0.00001f && fabs(target[2]) < 0.00001f){ // YZ plane
+        // TODO: this code is correct until MARK (refer to http://nehe.gamedev.net/article/camera_class_tutorial/18010/ to fix)
+        projectedTarget[0] = 0.0f;
+        normalizeVector(projectedTarget);
+
+        forward[0] = 0.0f; forward[1] = 0.0f; forward[2] = -1.0f;
+        crossProduct(up, forward, projectedTarget);
+        crossProduct(forward, up, target);
+        forward[0] = -forward[0]; forward[1] = -forward[1]; forward[2] = -forward[2];
+        // MARK
+    }else{ // XZ plane
+        projectedTarget[1] = 0.0f;
+        normalizeVector(projectedTarget);
+
+        forward[0] = target[0]; forward[1] = target[1]; forward[2] = target[2];
+        normalizeVector(forward);
+        up[0] = 0.0f; up[1] = 1.0f; up[2] = 0.0f;
+        Vector3f right;
+        crossProduct(right, projectedTarget, up);
+        right[0] = -right[0]; right[1] = -right[1]; right[2] = -right[2];
+        crossProduct(up, target, right);
+    }
+
+    normalizeVector(forward);
+    normalizeVector(up);
 }
 
 void Frame::getMatrix(Matrix44f matrix, bool rotationOnly){

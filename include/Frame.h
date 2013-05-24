@@ -33,6 +33,9 @@ class Frame {
         void moveForward(float delta);
         void moveUp(float delta);
         void moveRight(float delta);
+        // look at
+        void lookAt(float x, float y, float z);
+        void lookAt(Math3D::Vector3f vector);
         // assemble matrix
         void getMatrix(Math3D::Matrix44f matrix, bool rotationOnly = false);
         void getCameraMatrix(Math3D::Matrix44f matrix, bool rotationOnly = false);

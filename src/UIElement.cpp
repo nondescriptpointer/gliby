@@ -47,7 +47,6 @@ void UIElement::load(const char* location){
         strcat(newstring,fullpath);
         // add actual filename
         strcat(newstring,location);
-        std::cout << newstring << std::endl;
         path = newstring;
     }
     window->window()->navigateTo(path,strlen(path));
