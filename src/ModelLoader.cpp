@@ -9,9 +9,6 @@
 #include <assimp/postprocess.h>
 #include <GL/glew.h>
 
-// TODO: matching doesn't work
-// TODO: texture coordinates not implemented yet
-
 // TODO: support for multiple texture coordinates
 // TODO: support for more vertex attributes
 // TODO: support for animations
@@ -43,11 +40,12 @@ Model* ModelLoader::load(const char* file){
     if(scene->mNumMeshes > 0){
         const aiMesh* mesh = scene->mMeshes[0];
 
-        unsigned int nIndexes = 0;
-        unsigned int nVerts = 0;
+        unsigned int nIndexes = mesh->mNumFaces*3;
+        unsigned int nVerts = mesh->mNumVertices;
         const float e = 0.00001f; // vertex merge sensitivity
         
-        GLushort indexes[mesh->mNumVertices];
+        std::cout << mesh->mNumVertices << std::endl;
+        GLushort indexes[mesh->mNumFaces*3];
         Vector3f verts[mesh->mNumVertices];
         Vector3f* norms = NULL;
         Vector2f* texcoords = NULL;
@@ -61,43 +59,26 @@ Model* ModelLoader::load(const char* file){
             nBuffers++;
         }
 
+        // fill indexes
         for(unsigned int i = 0; i < mesh->mNumFaces; i++){
-            for(unsigned int e = 0; e < mesh->mFaces[i].mNumIndices; e++){
-                int index = mesh->mFaces[i].mIndices[e];
-                std::cout << index << 
-                // look for a match, if match found just add index
-                bool matched = false;
-                for(unsigned int match = 0; match < nVerts; match++){
-                    matched = true;
-                    if(!(closeEnough(verts[match][0], mesh->mVertices[index][0], e) && closeEnough(verts[match][1], mesh->mVertices[index][1], e) && closeEnough(verts[match][2], mesh->mVertices[index][2], e)))
-                        matched = false;
-                    if(matched){
-                        std::cout << "matched" << std::endl;
-                        indexes[nIndexes] = match;
-                        nIndexes++;
-                        break;
-                    }
-                }
-                // no match, add vertex
-                if(!matched && nVerts < mesh->mNumVertices && nIndexes < mesh->mNumVertices){
-                    // vertex
-                    Vector3f vert = {mesh->mVertices[index][0],mesh->mVertices[index][1],mesh->mVertices[index][2]};
-                    memcpy(verts[nVerts], vert, sizeof(Vector3f));
-                    // normal
-                    if(mesh->HasNormals()){
-                        Vector3f normal = {mesh->mNormals[index][0],mesh->mNormals[index][1],mesh->mNormals[index][2]};
-                        memcpy(norms[nVerts], normal, sizeof(Vector3f));
-                    }
-                    // texcoords
-                    if(mesh->HasTextureCoords(0)){
-                        std::cout << "texcoords" << std::endl;
-                        std::cout << mesh->mTextureCoords[index][0][0] << std::endl;
-                    }
-                    // index
-                    indexes[nIndexes] = nVerts;
-                    nIndexes++;
-                    nVerts++;
-                }
+            indexes[i*3] = mesh->mFaces[i].mIndices[0];
+            indexes[i*3+1] = mesh->mFaces[i].mIndices[1];
+            indexes[i*3+2] = mesh->mFaces[i].mIndices[2];
+        }
+
+        // fill vertices
+        for(unsigned int i = 0; i < mesh->mNumVertices; i++){
+            Vector3f vert = {mesh->mVertices[i][0],mesh->mVertices[i][1],mesh->mVertices[i][2]};
+            memcpy(verts[i], vert, sizeof(Vector3f));
+            // normal
+            if(mesh->HasNormals()){
+                Vector3f normal = {mesh->mNormals[i][0],mesh->mNormals[i][1],mesh->mNormals[i][2]};
+                memcpy(norms[i], normal, sizeof(Vector3f));
+            }
+            // texcoords
+            if(mesh->HasTextureCoords(0)){
+                Vector2f tex = {mesh->mTextureCoords[0][i][0],mesh->mTextureCoords[0][i][1]};
+                memcpy(texcoords[i], tex, sizeof(Vector2f));
             }
         }
 
