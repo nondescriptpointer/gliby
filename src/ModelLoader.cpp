@@ -31,7 +31,7 @@ ModelLoader::ModelLoader(void){
 
 Model* ModelLoader::load(const char* file){
     Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(file,aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
+    const aiScene* scene = importer.ReadFile(file, aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
     if(!scene){
         std::cerr << "Model import of: " << file << " failed!" << std::endl;
         std::cerr << importer.GetErrorString() << std::endl;
@@ -42,9 +42,7 @@ Model* ModelLoader::load(const char* file){
 
         unsigned int nIndexes = mesh->mNumFaces*3;
         unsigned int nVerts = mesh->mNumVertices;
-        const float e = 0.00001f; // vertex merge sensitivity
         
-        std::cout << mesh->mNumVertices << std::endl;
         GLushort indexes[mesh->mNumFaces*3];
         Vector3f verts[mesh->mNumVertices];
         Vector3f* norms = NULL;

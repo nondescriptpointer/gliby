@@ -5,6 +5,7 @@ in vec3 vNormal;
 in vec2 vTexCoord;
 
 uniform mat4 mvpMatrix;
+uniform mat4 mvMatrix;
 uniform mat3 normalMatrix;
 uniform vec3 lightPosition;
 
@@ -16,9 +17,13 @@ void main(void){
     // texture coordinates
     vTex = vTexCoord; 
 
+    // get vertex position in eye coordinates
+    vec4 position = mvMatrix * vVertex;
+    vec3 pos = position.xyz / position.w;
+
     // surface normal in eye coordinates
     vNorm = normalMatrix * vNormal;
-    vLightDir = normalize(lightPosition - vVertex.xyz);
+    vLightDir = normalize(lightPosition - pos);
 
     gl_Position = mvpMatrix * vVertex;
 }
