@@ -13,6 +13,7 @@ struct ShaderAttribute {
 class ShaderManager {
     public:
         ShaderManager(std::vector<const char*>* search_path);
+        ShaderManager(int num_search_path, const char** search_path);
         ~ShaderManager(void);
 
         GLuint buildShaderPair(const char* vertex_file, const char* fragment_file, const unsigned int nAttributes = 0, const ShaderAttribute* attributes = NULL);
@@ -20,7 +21,8 @@ class ShaderManager {
     private:
         GLuint buildShader(const char* shader_file,GLenum type); 
 
-        std::vector<const char*>* searchPath;
+        int numSearchPath;
+        const char** searchPath;
         std::unordered_map<const char*,GLuint> shaderCache;
 };
 

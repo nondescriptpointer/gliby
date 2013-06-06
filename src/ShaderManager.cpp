@@ -8,7 +8,25 @@
 using namespace gliby;
 
 ShaderManager::ShaderManager(std::vector<const char*>* search_path){
-    searchPath = search_path;
+    numSearchPath = search_path->size();
+    searchPath = new const char*[numSearchPath];
+    int index = 0;
+    for(std::vector<const char*>::iterator i = search_path->begin(); i != search_path->end(); ++i){
+        std::cout << strlen(*i) << std::endl;
+        char* str = new char[strlen(*i)];
+        strncpy(str,*i,strlen(*i));
+        searchPath[index] = str;
+        index++;
+    }
+}
+ShaderManager::ShaderManager(int num_search_path, const char** search_path){
+    numSearchPath = num_search_path;
+    searchPath = new const char*[num_search_path];
+    for(int i = 0; i < num_search_path; i++){
+        char* str = new char[strlen(search_path[i])];
+        strncpy(str,search_path[i],strlen(search_path[i]));
+        searchPath[i] = str;
+    }
 }
 
 ShaderManager::~ShaderManager(void){
@@ -23,8 +41,8 @@ GLuint ShaderManager::buildShader(const char* shader_file,GLenum type){
     // create shader
     GLuint shader = glCreateShader(type);
     // load file from search path
-    for(std::vector<const char*>::iterator i = searchPath->begin(); i != searchPath->end(); ++i){
-        boost::filesystem::path p(*i);
+    for(int i = 0; i < numSearchPath; i++){
+        boost::filesystem::path p(searchPath[i]);
         p /= shader_file;
         if(boost::filesystem::exists(p)){
             // load file
