@@ -8,7 +8,7 @@ Framecounter::Framecounter(void):frame(0),frameRate(0){
 
 bool Framecounter::tick(void){
     frame++;
-    int time = (int)glfwGetTime();
+    unsigned int time = (unsigned int)glfwGetTime();
     if(time > second){
         frameRate = frame;
         frame = 0;
