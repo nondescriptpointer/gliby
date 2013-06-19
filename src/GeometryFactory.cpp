@@ -120,6 +120,12 @@ Batch& GeometryFactory::plane(GLfloat width, GLfloat height, GLfloat x, GLfloat 
         width/2+x, -height/2+y, z,
         width/2+x, height/2+y, z
     };
+    GLfloat norms[] = {
+        0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f
+    };
     GLfloat texcoords[] = {
         0.0f, 0.0f,
         0.0f, 1.0f,
@@ -127,6 +133,7 @@ Batch& GeometryFactory::plane(GLfloat width, GLfloat height, GLfloat x, GLfloat 
         1.0f, 0.0f
     };
     batch->copyVertexData3f(verts);
+    batch->copyNormalDataf(norms);
     batch->copyTexCoordData2f(texcoords,0);
     batch->end();
     return *batch;
