@@ -33,7 +33,7 @@ ModelLoader::ModelLoader(void){
 
 Model* ModelLoader::load(const char* file){
     Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(file, aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
+    const aiScene* scene = importer.ReadFile(file, aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType | aiProcess_GenNormals);
     if(!scene){
         std::cerr << "Model import of: " << file << " failed!" << std::endl;
         std::cerr << importer.GetErrorString() << std::endl;
@@ -47,7 +47,7 @@ Model* ModelLoader::load(const char* file){
 
 vector<Model*>* ModelLoader::loadAll(const char* file){
     Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(file, aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
+    const aiScene* scene = importer.ReadFile(file, aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType | aiProcess_GenNormals);
     if(!scene){
         std::cerr << "Model import of: " << file << " failed!" << std::endl;
         std::cerr << importer.GetErrorString() << std::endl;
