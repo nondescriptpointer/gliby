@@ -1,5 +1,6 @@
 #include "ModelLoader.h"
 #include "Math3D.h"
+#include "TextureManager.h"
 
 #include <iostream>
 #include <Math3D.h>
@@ -9,6 +10,8 @@
 #include <assimp/postprocess.h>
 #include <GL/glew.h>
 #include <vector>
+#include <unordered_set>
+#include <string>
 
 // TODO: support for multiple texture coordinates
 // TODO: support for more vertex attributes
@@ -96,7 +99,7 @@ Material* Model::getMaterial(){
  * LOADER
  */
 
-ModelLoader::ModelLoader(void){
+ModelLoader::ModelLoader(TextureManager* textureManager):_textureManager(textureManager){
     // pass
 }
 
@@ -115,6 +118,7 @@ Model* ModelLoader::load(const char* file){
 }
 
 vector<Model*>* ModelLoader::loadAll(const char* file){
+    // load the scene
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(file, aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType | aiProcess_GenNormals);
     if(!scene){
@@ -122,7 +126,9 @@ vector<Model*>* ModelLoader::loadAll(const char* file){
         std::cerr << importer.GetErrorString() << std::endl;
         return NULL;
     }
+    // create all the materials
     Material** mats = new Material*[scene->mNumMaterials];
+    unordered_set<string> texfiles;
     for(unsigned int i = 0; i < scene->mNumMaterials; i++){
         aiMaterial* mat = scene->mMaterials[i];
         // create instance
@@ -147,11 +153,35 @@ vector<Model*>* ModelLoader::loadAll(const char* file){
         if(AI_SUCCESS == mat->Get(AI_MATKEY_OPACITY,fl)) mats[i]->setOpacity(fl);
         // get the textures
         aiString path;
-        if(AI_SUCCESS == mat->GetTexture(aiTextureType_DIFFUSE,0,&path)) mats[i]->setTextureDiffuse(path.C_Str());
-        if(AI_SUCCESS == mat->GetTexture(aiTextureType_SPECULAR,0,&path)) mats[i]->setTextureSpecular(path.C_Str());
-        if(AI_SUCCESS == mat->GetTexture(aiTextureType_OPACITY,0,&path)) mats[i]->setTextureOpacity(path.C_Str());
-        if(AI_SUCCESS == mat->GetTexture(aiTextureType_NORMALS,0,&path)) mats[i]->setTextureNormal(path.C_Str());
+        if(AI_SUCCESS == mat->GetTexture(aiTextureType_DIFFUSE,0,&path)){
+            texfiles.insert(string(path.C_Str()));
+            mats[i]->setTextureDiffuse(path.C_Str());
+        }
+        if(AI_SUCCESS == mat->GetTexture(aiTextureType_SPECULAR,0,&path)){
+            texfiles.insert(string(path.C_Str()));
+            mats[i]->setTextureSpecular(path.C_Str());
+        }
+        if(AI_SUCCESS == mat->GetTexture(aiTextureType_OPACITY,0,&path)){
+            texfiles.insert(string(path.C_Str()));
+            mats[i]->setTextureOpacity(path.C_Str());
+        }
+        if(AI_SUCCESS == mat->GetTexture(aiTextureType_NORMALS,0,&path)){ 
+            texfiles.insert(string(path.C_Str()));
+            mats[i]->setTextureNormal(path.C_Str());
+        }
     }
+    // load all the textures that are being used by materials
+    if(_textureManager){
+        const char* textures[texfiles.size()];
+        int i = 0;
+        for(unordered_set<string>::iterator it = texfiles.begin(); it != texfiles.end(); ++it){
+            textures[i] = (*it).c_str();
+            std::cout << textures[i] << std::endl;
+            i++;
+        }
+        _textureManager->loadTextures(sizeof(textures)/sizeof(char*),textures,GL_TEXTURE_2D,GL_TEXTURE0);
+    }
+    // create all the meshes and return
     if(scene->mNumMeshes > 0){
         vector<Model*>* vect = new vector<Model*>;
         for(unsigned int i = 0; i < scene->mNumMeshes; i++){

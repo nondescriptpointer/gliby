@@ -7,6 +7,7 @@
 #include <assimp/scene.h>
 #include <assimp/cimport.h>
 #include "Math3D.h"
+#include "TextureManager.h"
 
 namespace gliby {
 
@@ -73,11 +74,12 @@ class Model : public Geometry {
 
 class ModelLoader {
     public:
-        ModelLoader(void);
+        ModelLoader(TextureManager* textureManager);
         Model* load(const char* file);
         std::vector<Model*>* loadAll(const char* file);
     protected:
         Model* loadMesh(const aiMesh* mesh);
+        TextureManager* _textureManager;
 };
 
 }
