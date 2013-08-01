@@ -13,12 +13,71 @@
 // TODO: support for multiple texture coordinates
 // TODO: support for more vertex attributes
 // TODO: support for animations
+// TODO: figure out a way to clean up loaded stuff
+// TODO: maybe add loading of following material properties: shading_model, blend_func, refrection index, bumbscaling, reflectivity
+// TODO: there are more advanced things to do with textures like supporting multiple textures, having different mappings/uv's,blend factors, mapping modes etc.
 
 using namespace std;
 using namespace gliby;
 using namespace Math3D;
 
-Model::Model(GLuint vertexArray, unsigned int nIndexes):_vertexArray(vertexArray),_nIndexes(nIndexes){
+/*
+ * MATERIAL
+ * */
+
+Material::Material(const char* name):
+    _name(name),
+    _colorDiffuse{0.0f,0.0f,0.0f},
+    _colorSpecular{0.0f,0.0f,0.0f},
+    _colorAmbient{0.0f,0.0f,0.0f},
+    _colorEmissive{0.0f,0.0f,0.0f},
+    _colorTransparent{0.0f,0.0f,0.0f},
+    _wireframe(false),
+    _twoSided(false),
+    _shininess(0.0f),
+    _shininessStrength(1.0f),
+    _opacity(1.0f),
+    _textureDiffuse(NULL),
+    _textureSpecular(NULL),
+    _textureOpacity(NULL),
+    _textureNormal(NULL)
+    {
+    // pass
+}
+void Material::setColorDiffuse(float r, float g, float b){ _colorDiffuse[0] = r; _colorDiffuse[1] = g; _colorDiffuse[2] = b; }
+Vector3f* Material::getColorDiffuse(void){ return &_colorDiffuse; }
+void Material::setColorSpecular(float r, float g, float b){ _colorSpecular[0] = r; _colorSpecular[1] = g; _colorSpecular[2] = b; }
+Vector3f* Material::getColorSpecular(void){ return &_colorSpecular; }
+void Material::setColorAmbient(float r, float g, float b){ _colorAmbient[0] = r; _colorAmbient[1] = g; _colorAmbient[2] = b; }
+Vector3f* Material::getColorAmbient(void){ return &_colorAmbient; }
+void Material::setColorEmissive(float r, float g, float b){ _colorEmissive[0] = r; _colorEmissive[1] = g; _colorEmissive[2] = b; }
+Vector3f* Material::getColorEmissive(void){ return &_colorEmissive; }
+void Material::setColorTransparent(float r, float g, float b){ _colorTransparent[0] = r; _colorTransparent[1] = g; _colorTransparent[2] = b; }
+Vector3f* Material::getColorTransparent(void){ return &_colorTransparent; }
+void Material::setWireframe(bool wireframe){ _wireframe = wireframe; }
+bool Material::getWireframe(void){ return _wireframe; }
+void Material::setTwoSided(bool twoSided){ _twoSided = twoSided; }
+bool Material::getTwoSided(void){ return _twoSided; }
+void Material::setShininess(float shininess){ _shininess = shininess; }
+float Material::getShininess(void){ return _shininess; }
+void Material::setShininessStrength(float shininessStrength){ _shininessStrength = shininessStrength; }
+float Material::getShininessStrength(void){ return _shininessStrength; }
+void Material::setOpacity(float opacity){ _opacity = opacity; }
+float Material::getOpacity(void){ return _opacity; }
+void Material::setTextureDiffuse(const char* textureDiffuse){ _textureDiffuse = textureDiffuse; }
+const char* Material::getTextureDiffuse(void){ return _textureDiffuse; }
+void Material::setTextureSpecular(const char* textureSpecular){ _textureSpecular = textureSpecular; }
+const char* Material::getTextureSpecular(void){ return _textureSpecular; }
+void Material::setTextureOpacity(const char* textureOpacity){ _textureOpacity = textureOpacity; }
+const char* Material::getTextureOpacity(void){ return _textureOpacity; }
+void Material::setTextureNormal(const char* textureNormal){ _textureNormal = textureNormal; }
+const char* Material::getTextureNormal(void){ return _textureNormal; }
+
+/*
+ * MODEL
+ * */
+
+Model::Model(GLuint vertexArray, unsigned int nIndexes):_vertexArray(vertexArray),_nIndexes(nIndexes),_material(NULL){
     // pass
 }
 void Model::draw(void){
@@ -26,6 +85,16 @@ void Model::draw(void){
     glDrawElements(GL_TRIANGLES, _nIndexes, GL_UNSIGNED_SHORT, 0);
     glBindVertexArray(0);
 }
+void Model::setMaterial(Material* material){
+    _material = material;
+}
+Material* Model::getMaterial(){
+    return _material;
+}
+
+/*
+ * LOADER
+ */
 
 ModelLoader::ModelLoader(void){
     // pass
@@ -53,10 +122,41 @@ vector<Model*>* ModelLoader::loadAll(const char* file){
         std::cerr << importer.GetErrorString() << std::endl;
         return NULL;
     }
+    Material** mats = new Material*[scene->mNumMaterials];
+    for(unsigned int i = 0; i < scene->mNumMaterials; i++){
+        aiMaterial* mat = scene->mMaterials[i];
+        // create instance
+        aiString name;
+        mat->Get(AI_MATKEY_NAME,name);
+        mats[i] = new Material(name.C_Str());
+        // assign colors if available
+        aiColor3D color;
+        if(AI_SUCCESS == mat->Get(AI_MATKEY_COLOR_DIFFUSE,color)) mats[i]->setColorDiffuse(color[0],color[1],color[2]);
+        if(AI_SUCCESS == mat->Get(AI_MATKEY_COLOR_SPECULAR,color)) mats[i]->setColorSpecular(color[0],color[1],color[2]);
+        if(AI_SUCCESS == mat->Get(AI_MATKEY_COLOR_AMBIENT,color)) mats[i]->setColorAmbient(color[0],color[1],color[2]);
+        if(AI_SUCCESS == mat->Get(AI_MATKEY_COLOR_EMISSIVE,color)) mats[i]->setColorEmissive(color[0],color[1],color[2]);
+        if(AI_SUCCESS == mat->Get(AI_MATKEY_COLOR_TRANSPARENT,color)) mats[i]->setColorTransparent(color[0],color[1],color[2]);
+        // some bools
+        int attr;
+        if(AI_SUCCESS == mat->Get(AI_MATKEY_ENABLE_WIREFRAME,attr)) mats[i]->setWireframe(attr > 0);
+        if(AI_SUCCESS == mat->Get(AI_MATKEY_TWOSIDED,attr)) mats[i]->setTwoSided(attr > 0);
+        // some floats
+        float fl;
+        if(AI_SUCCESS == mat->Get(AI_MATKEY_SHININESS,fl)) mats[i]->setShininess(fl);
+        if(AI_SUCCESS == mat->Get(AI_MATKEY_SHININESS_STRENGTH,fl)) mats[i]->setShininessStrength(fl);
+        if(AI_SUCCESS == mat->Get(AI_MATKEY_OPACITY,fl)) mats[i]->setOpacity(fl);
+        // get the textures
+        aiString path;
+        if(AI_SUCCESS == mat->GetTexture(aiTextureType_DIFFUSE,0,&path)) mats[i]->setTextureDiffuse(path.C_Str());
+        if(AI_SUCCESS == mat->GetTexture(aiTextureType_SPECULAR,0,&path)) mats[i]->setTextureSpecular(path.C_Str());
+        if(AI_SUCCESS == mat->GetTexture(aiTextureType_OPACITY,0,&path)) mats[i]->setTextureOpacity(path.C_Str());
+        if(AI_SUCCESS == mat->GetTexture(aiTextureType_NORMALS,0,&path)) mats[i]->setTextureNormal(path.C_Str());
+    }
     if(scene->mNumMeshes > 0){
         vector<Model*>* vect = new vector<Model*>;
         for(unsigned int i = 0; i < scene->mNumMeshes; i++){
             Model* model = loadMesh(scene->mMeshes[i]);
+            model->setMaterial(mats[scene->mMeshes[i]->mMaterialIndex]);
             if(model) vect->push_back(model);
         }
         return vect;
