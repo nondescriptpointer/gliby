@@ -29,7 +29,6 @@ using namespace Math3D;
  * */
 
 Material::Material(const char* name):
-    _name(name),
     _colorDiffuse{0.0f,0.0f,0.0f},
     _colorSpecular{0.0f,0.0f,0.0f},
     _colorAmbient{0.0f,0.0f,0.0f},
@@ -45,7 +44,7 @@ Material::Material(const char* name):
     _textureOpacity(NULL),
     _textureNormal(NULL)
     {
-    // pass
+    _name = strdup(name);
 }
 void Material::setColorDiffuse(float r, float g, float b){ _colorDiffuse[0] = r; _colorDiffuse[1] = g; _colorDiffuse[2] = b; }
 Vector3f* Material::getColorDiffuse(void){ return &_colorDiffuse; }
@@ -67,13 +66,29 @@ void Material::setShininessStrength(float shininessStrength){ _shininessStrength
 float Material::getShininessStrength(void){ return _shininessStrength; }
 void Material::setOpacity(float opacity){ _opacity = opacity; }
 float Material::getOpacity(void){ return _opacity; }
-void Material::setTextureDiffuse(const char* textureDiffuse){ _textureDiffuse = textureDiffuse; }
+void Material::setTextureDiffuse(const char* textureDiffuse){ 
+    string str(textureDiffuse);
+    replace(str.begin(),str.end(),'\\','/');
+    _textureDiffuse = str.c_str();
+}
 const char* Material::getTextureDiffuse(void){ return _textureDiffuse; }
-void Material::setTextureSpecular(const char* textureSpecular){ _textureSpecular = textureSpecular; }
+void Material::setTextureSpecular(const char* textureSpecular){ 
+    string str(textureSpecular);
+    replace(str.begin(),str.end(),'\\','/');
+    _textureSpecular = str.c_str();
+}
 const char* Material::getTextureSpecular(void){ return _textureSpecular; }
-void Material::setTextureOpacity(const char* textureOpacity){ _textureOpacity = textureOpacity; }
+void Material::setTextureOpacity(const char* textureOpacity){ 
+    string str(textureOpacity);
+    replace(str.begin(),str.end(),'\\','/');
+    _textureOpacity = str.c_str();
+}
 const char* Material::getTextureOpacity(void){ return _textureOpacity; }
-void Material::setTextureNormal(const char* textureNormal){ _textureNormal = textureNormal; }
+void Material::setTextureNormal(const char* textureNormal){ 
+    string str(textureNormal);
+    replace(str.begin(),str.end(),'\\','/');
+    _textureNormal = str.c_str();
+} 
 const char* Material::getTextureNormal(void){ return _textureNormal; }
 
 /*
@@ -154,20 +169,20 @@ vector<Model*>* ModelLoader::loadAll(const char* file){
         // get the textures
         aiString path;
         if(AI_SUCCESS == mat->GetTexture(aiTextureType_DIFFUSE,0,&path)){
-            texfiles.insert(string(path.C_Str()));
             mats[i]->setTextureDiffuse(path.C_Str());
+            texfiles.insert(string(mats[i]->getTextureDiffuse()));
         }
         if(AI_SUCCESS == mat->GetTexture(aiTextureType_SPECULAR,0,&path)){
-            texfiles.insert(string(path.C_Str()));
             mats[i]->setTextureSpecular(path.C_Str());
+            texfiles.insert(string(mats[i]->getTextureSpecular()));
         }
         if(AI_SUCCESS == mat->GetTexture(aiTextureType_OPACITY,0,&path)){
-            texfiles.insert(string(path.C_Str()));
             mats[i]->setTextureOpacity(path.C_Str());
+            texfiles.insert(string(mats[i]->getTextureOpacity()));
         }
         if(AI_SUCCESS == mat->GetTexture(aiTextureType_NORMALS,0,&path)){ 
-            texfiles.insert(string(path.C_Str()));
             mats[i]->setTextureNormal(path.C_Str());
+            texfiles.insert(string(mats[i]->getTextureNormal()));
         }
     }
     // load all the textures that are being used by materials
@@ -176,7 +191,6 @@ vector<Model*>* ModelLoader::loadAll(const char* file){
         int i = 0;
         for(unordered_set<string>::iterator it = texfiles.begin(); it != texfiles.end(); ++it){
             textures[i] = (*it).c_str();
-            std::cout << textures[i] << std::endl;
             i++;
         }
         _textureManager->loadTextures(sizeof(textures)/sizeof(char*),textures,GL_TEXTURE_2D,GL_TEXTURE0);

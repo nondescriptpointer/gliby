@@ -1,5 +1,6 @@
 #include "TextureManager.h"
 #include <FreeImage.h>
+#include <iostream>
 
 using namespace gliby;
 
