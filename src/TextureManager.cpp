@@ -16,8 +16,8 @@ void TextureManager::loadTextures(int numTextures, const char** texts, GLenum ta
         glGenTextures(1,&tex);
         glBindTexture(target, tex);
         // some good defaults, may change this later
-        glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_REPEAT);
         glTexParameterf(target, GL_TEXTURE_MAX_ANISOTROPY_EXT, largest_anisotropy);
         glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
