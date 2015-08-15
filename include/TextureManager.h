@@ -13,7 +13,6 @@ class TextureManager {
     protected:
         std::map<std::string, GLuint> textures;
         GLfloat largest_anisotropy;
-
 };
 
 }

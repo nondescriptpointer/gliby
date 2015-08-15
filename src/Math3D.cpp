@@ -638,7 +638,7 @@ bool Math3D::closeEnough(const float candidate, const float compare, const float
     return (fabs(candidate - compare) < epsilon);
 }
 bool Math3D::closeEnough(const double candidate, const double compare, const double epsilon){
-    return (abs(candidate - compare) < epsilon);
+    return (std::abs(candidate - compare) < epsilon);
 }
 
 void Math3D::catmullRom(Vector3f out, const Vector3f p0, const Vector3f p1, const Vector3f p2, const Vector3f p3, float t){
