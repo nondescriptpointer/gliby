@@ -22,7 +22,7 @@ ShaderManager::ShaderManager(int num_search_path, const char** search_path){
     numSearchPath = num_search_path;
     searchPath = new const char*[num_search_path];
     for(int i = 0; i < num_search_path; i++){
-        char* str = new char[sizeof(search_path[i])];
+        char* str = new char[strlen(search_path[i])+1];
         strcpy(str,search_path[i]);
         searchPath[i] = str;
     }
