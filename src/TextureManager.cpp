@@ -29,6 +29,7 @@ void TextureManager::loadTextures(int numTextures, const char** texts, GLenum ta
         FIBITMAP* temp = imagen;
         imagen = FreeImage_ConvertTo32Bits(imagen);
         FreeImage_Unload(temp);
+        FreeImage_FlipVertical(imagen);
         int w = FreeImage_GetWidth(imagen);
         int h = FreeImage_GetHeight(imagen);
         // load into opengl

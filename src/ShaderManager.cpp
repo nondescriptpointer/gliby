@@ -12,7 +12,6 @@ ShaderManager::ShaderManager(std::vector<const char*>* search_path){
     searchPath = new const char*[numSearchPath];
     int index = 0;
     for(std::vector<const char*>::iterator i = search_path->begin(); i != search_path->end(); ++i){
-        std::cout << strlen(*i) << std::endl;
         char* str = new char[strlen(*i)];
         strncpy(str,*i,strlen(*i));
         searchPath[index] = str;
@@ -23,8 +22,8 @@ ShaderManager::ShaderManager(int num_search_path, const char** search_path){
     numSearchPath = num_search_path;
     searchPath = new const char*[num_search_path];
     for(int i = 0; i < num_search_path; i++){
-        char* str = new char[strlen(search_path[i])];
-        strncpy(str,search_path[i],strlen(search_path[i]));
+        char* str = new char[sizeof(search_path[i])];
+        strcpy(str,search_path[i]);
         searchPath[i] = str;
     }
 }
@@ -104,7 +103,9 @@ GLuint ShaderManager::buildShaderPair(const char* vertex_file, const char* fragm
     GLint status;
     glGetProgramiv(program, GL_LINK_STATUS, &status);
     if(status == GL_FALSE){
-        std::cout << "Shader linking of '" << vertex_file << "' and '" << fragment_file << "' failed." << std::endl;
+        char log[1024];
+        glGetProgramInfoLog(program, 1024, NULL, log);
+        std::cout << "Shader linking of '" << vertex_file << "' and '" << fragment_file << "' failed. Log:" << log << std::endl;
         glDeleteProgram(program);
         return 0;
     }
